@@ -1,10 +1,8 @@
-[![Build Status](https://travis-ci.com/lessonly/scim_rails.svg?branch=master)](https://travis-ci.com/lessonly/scim_rails)
-[![Inline docs](http://inch-ci.org/github/lessonly/scim_rails.svg?branch=master)](http://inch-ci.org/github/lessonly/scim_rails)
-[![Maintainability](https://api.codeclimate.com/v1/badges/ddfb6a891d2f0d1122ae/maintainability)](https://codeclimate.com/github/lessonly/scim_rails/maintainability)
 
 # ScimRails
 
-NOTE: This Gem is not yet fully SCIM complaint. It was developed with the main function of interfacing with Okta. There are features of SCIM that this Gem does not implement as described in the SCIM documentation or that have been left out completely.
+This Gem is a fork of https://github.com/lessonly/scim_rails and enables rails apps to interface with Okta via the SCIM standard. As such this documentation may have changes that aren't in the original forked repo.
+As such this documentation serves the purposes of developers at Hendrick.
 
 #### What is SCIM?
 
