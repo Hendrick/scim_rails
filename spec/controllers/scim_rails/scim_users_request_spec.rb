@@ -1,9 +1,6 @@
 require "spec_helper"
 
 RSpec.describe ScimRails::ScimUsersController, type: :request do
-  let(:company) { create(:company) }
-  let(:credentials) { Base64::encode64("#{company.subdomain}:#{company.api_token}") }
-  let(:authorization) { "Basic #{credentials}" }
 
   def post_request(content_type = "application/scim+json")
     # params need to be transformed into a string to test if they are being parsed by Rack
@@ -26,30 +23,38 @@ RSpec.describe ScimRails::ScimUsersController, type: :request do
          }
   end
 
-  describe "Content-Type" do
-    it "accepts scim+json" do
-      expect(company.users.count).to eq 0
+  context "Basic Auth" do
+    let(:company) { create(:company) }
+    let(:credentials) { Base64::encode64("#{company.subdomain}:#{company.api_token}") }
+    let(:authorization) { "Basic #{credentials}" }
 
-      post_request("application/scim+json")
+    describe "Content-Type" do
+      it "accepts scim+json" do
+        expect(company.users.count).to eq 0
 
-      expect(request.params).to include :name
-      expect(response.status).to eq 201
-      expect(response.media_type).to eq "application/scim+json"
-      expect(company.users.count).to eq 1
-    end
+        post_request("application/scim+json")
 
-    it "can not parse unfamiliar content types" do
-      expect(company.users.count).to eq 0
+        expect(request.params).to include :name
+        expect(response.status).to eq 201
+        expect(response.media_type).to eq "application/scim+json"
+        expect(company.users.count).to eq 1
+      end
 
-      post_request("text/csv")
+      it "can not parse unfamiliar content types" do
+        expect(company.users.count).to eq 0
 
-      expect(request.params).not_to include :name
-      expect(response.status).to eq 422
-      expect(company.users.count).to eq 0
+        post_request("text/csv")
+
+        expect(request.params).not_to include :name
+        expect(response.status).to eq 422
+        expect(company.users.count).to eq 0
+      end
     end
   end
 
   context "OAuth Bearer Authorization" do
+    let(:company) { create(:company) }
+
     context "with valid token" do
       let(:authorization) { "Bearer #{company.api_token}" }
 

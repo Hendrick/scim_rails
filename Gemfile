@@ -12,3 +12,4 @@ gemspec
 
 gem "rails", "~> 6.1", ">= 6.0"
 gem 'pry', group: [:development, :test]
+gem 'byebug', group: [:development, :test]

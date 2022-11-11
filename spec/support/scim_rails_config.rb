@@ -2,7 +2,12 @@
 # is included here because it is essentially a spec helper
 
 ScimRails.configure do |config|
+  # we shouldn't have to specify company and should eventually remove this.
   config.basic_auth_model = "Company"
+
+  config.subdomain = ENV['scim_subdomain'] if ENV['scim_subdomain'].present?
+  config.api_token = ENV['scim_password'] if ENV['scim_password'].present?
+
   config.scim_users_model = "User"
 
   config.basic_auth_model_searchable_attribute = :subdomain

@@ -10,6 +10,7 @@ module ScimRails
       @search_parameter = { ScimRails.config.basic_auth_model_searchable_attribute => @searchable_attribute }
     end
 
+    #company being referenced need to be refactored
     def company
       company = find_company
       authorize(company)
@@ -22,6 +23,7 @@ module ScimRails
     attr_reader :search_parameter
     attr_reader :searchable_attribute
 
+    #company being referenced need to be refactored
     def find_company
       @company ||= ScimRails.config.basic_auth_model.find_by!(search_parameter)
 
@@ -29,6 +31,7 @@ module ScimRails
       raise ScimRails::ExceptionHandler::InvalidCredentials
     end
 
+    #company being referenced need to be refactored
     def authorize(authentication_model)
       authorized = ActiveSupport::SecurityUtils.secure_compare(
         authentication_model.public_send(ScimRails.config.basic_auth_model_authenticatable_attribute),
