@@ -5,25 +5,20 @@ module ScimRails
     include Response
 
     before_action :authorize_request
-    byebug
 
     private
 
     def authorize_request
+      authorization = nil
+      # I want to only use the basic auth and eliminate the oauth strategy. Less tests to maintain.....
       send(authentication_strategy) do |searchable_attribute, authentication_attribute|
-        #authorize the request with the params in the env for app
         authorization = AuthorizeApiRequest.new(
           searchable_attribute: searchable_attribute,
           authentication_attribute: authentication_attribute
         )
-
-        @company = authorization.company
-        byebug
       end
-      raise ScimRails::ExceptionHandler::InvalidCredentials if true || authorization.authenticated2?
+      raise ScimRails::ExceptionHandler::InvalidCredentials unless authorization.authenticated2?
     end
-
-
 
     def authentication_strategy
       if request.headers["Authorization"]&.include?("Bearer")

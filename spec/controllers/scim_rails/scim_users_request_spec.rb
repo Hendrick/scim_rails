@@ -86,33 +86,36 @@ RSpec.describe ScimRails::ScimUsersController, type: :request do
           expect(company.users.count).to eq 0
         end
       end
+
+      ENV['SCIM_USERNAME'] = cached_subdomain
+      ENV['SCIM_PASSWORD'] = cahced_api_token
     end
   end
 
-  context "OAuth Bearer Authorization" do
+  # context "OAuth Bearer Authorization" do
 
-    let(:company) { create(:company) }
-    let(:credentials) { Base64::encode64("#{company.subdomain}:#{company.api_token}") }
-    let(:authorization) { "Basic #{credentials}" }
+  #   let(:company) { create(:company) }
+  #   let(:credentials) { Base64::encode64("#{company.subdomain}:#{company.api_token}") }
+  #   let(:authorization) { "Basic #{credentials}" }
 
-    context "with valid token" do
-      let(:authorization) { "Bearer #{company.api_token}" }
+  #   context "with valid token" do
+  #     let(:authorization) { "Bearer #{company.api_token}" }
 
-      it "supports OAuth bearer authorization and succeeds" do
-        expect { post_request }.to change(company.users, :count).from(0).to(1)
+  #     it "supports OAuth bearer authorization and succeeds" do
+  #       expect { post_request }.to change(company.users, :count).from(0).to(1)
 
-        expect(response.status).to eq 201
-      end
-    end
+  #       expect(response.status).to eq 201
+  #     end
+  #   end
 
-    context "with invalid token" do
-      let(:authorization) { "Bearer #{SecureRandom.hex}" }
+  #   context "with invalid token" do
+  #     let(:authorization) { "Bearer #{SecureRandom.hex}" }
 
-      it "The request fails" do
-        expect { post_request }.not_to change(company.users, :count)
+  #     it "The request fails" do
+  #       expect { post_request }.not_to change(company.users, :count)
 
-        expect(response.status).to eq 401
-      end
-    end
-  end
+  #       expect(response.status).to eq 401
+  #     end
+  #   end
+  # end
 end

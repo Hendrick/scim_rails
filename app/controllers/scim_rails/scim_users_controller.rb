@@ -1,21 +1,19 @@
 module ScimRails
   class ScimUsersController < ScimRails::ApplicationController
     def index
-      byebug
       if params[:filter].present?
         query = ScimRails::ScimQueryParser.new(params[:filter])
 
-        users = Users
+        users = User
           .where(
             "#{ScimRails.config.scim_users_model.connection.quote_column_name(query.attribute)} #{query.operator} ?",
             query.parameter
           )
           .order(ScimRails.config.scim_users_list_order)
       else
-        users = Users
+        users = User
           .order(ScimRails.config.scim_users_list_order)
       end
-      byebug
 
       counts = ScimCount.new(
         start_index: params[:startIndex],
@@ -28,13 +26,12 @@ module ScimRails
 
     def create
       if ScimRails.config.scim_user_prevent_update_on_create
-        user = Users.create!(permitted_user_params)
+        user = User.create!(permitted_user_params)
       else
         username_key = ScimRails.config.queryable_user_attributes[:userName]
         find_by_username = Hash.new
         find_by_username[username_key] = permitted_user_params[username_key]
-        user = Users
-          .public_send(ScimRails.config.scim_users_scope)
+        user = User
           .find_or_create_by(find_by_username)
         user.update!(permitted_user_params)
       end
@@ -43,12 +40,12 @@ module ScimRails
     end
 
     def show
-      user = Users.find(params[:id])
+      user = User.find(params[:id])
       json_scim_response(object: user)
     end
 
     def put_update
-      user = Users.find(params[:id])
+      user = User.find(params[:id])
       update_status(user) unless put_active_param.nil?
       user.update!(permitted_user_params)
       json_scim_response(object: user)
@@ -57,7 +54,7 @@ module ScimRails
     # TODO: PATCH will only deprovision or reprovision users.
     # This will work just fine for Okta but is not SCIM compliant.
     def patch_update
-      user = Users.find(params[:id])
+      user = User.find(params[:id])
       update_status(user)
       json_scim_response(object: user)
     end
@@ -108,7 +105,7 @@ module ScimRails
     end
 
     def active?
-      active = put_active_param
+      ctive = put_active_param
       active = patch_active_param if active.nil?
 
       case active

@@ -53,7 +53,6 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
 
         get :index, as: :json
         response_body = JSON.parse(response.body)
-        byebug
         expect(response_body.dig("schemas", 0)).to eq "urn:ietf:params:scim:api:messages:2.0:ListResponse"
         expect(response_body["totalResults"]).to eq 10
       end
@@ -629,15 +628,6 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
 
       it "returns :not_found for id that cannot be found" do
         get :patch_update, params: patch_params(id: "fake_id"), as: :json
-
-        expect(response.status).to eq 404
-      end
-
-      it "returns :not_found for a correct id but unauthorized company" do
-        new_company = create(:company)
-        create(:user, company: new_company, id: 1000)
-
-        get :patch_update, params: patch_params(id: 1000), as: :json
 
         expect(response.status).to eq 404
       end

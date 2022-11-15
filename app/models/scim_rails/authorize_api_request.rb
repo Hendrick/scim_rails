@@ -4,19 +4,18 @@ module ScimRails
     def initialize(searchable_attribute:, authentication_attribute:)
       @searchable_attribute = searchable_attribute
       @authentication_attribute = authentication_attribute
-      # byebug
 
       raise ScimRails::ExceptionHandler::InvalidCredentials if searchable_attribute.blank? || authentication_attribute.blank?
 
       @search_parameter = { ScimRails.config.basic_auth_model_searchable_attribute => @searchable_attribute }
     end
 
-    #company being referenced need to be refactored
-    def company
-      company = find_company
-      authorize(company)
-      company
-    end
+    # #company being referenced need to be refactored
+    # def company
+    #   company = find_company
+    #   authorize(company)
+    #   company
+    # end
 
 
     def authenticated2?
