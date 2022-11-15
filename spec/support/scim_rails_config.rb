@@ -5,8 +5,8 @@ ScimRails.configure do |config|
   # we shouldn't have to specify company and should eventually remove this.
   config.basic_auth_model = "Company"
 
-  config.subdomain = ENV['scim_subdomain'] if ENV['scim_subdomain'].present?
-  config.api_token = ENV['scim_password'] if ENV['scim_password'].present?
+  config.subdomain = nil || ENV['SCIM_USERNAME']
+  config.api_token = nil || ENV['SCIM_PASSWORD']
 
   config.scim_users_model = "User"
 

@@ -4,6 +4,7 @@ module ScimRails
     def initialize(searchable_attribute:, authentication_attribute:)
       @searchable_attribute = searchable_attribute
       @authentication_attribute = authentication_attribute
+      # byebug
 
       raise ScimRails::ExceptionHandler::InvalidCredentials if searchable_attribute.blank? || authentication_attribute.blank?
 
@@ -15,6 +16,17 @@ module ScimRails
       company = find_company
       authorize(company)
       company
+    end
+
+
+    def authenticated2?
+      if ENV['SCIM_USERNAME'].present? && ENV['SCIM_PASSWORD'].present?
+        authorize_basic_auth
+      else
+        company = find_company
+        authorize(company)
+        company
+      end
     end
 
     private
@@ -29,6 +41,12 @@ module ScimRails
 
     rescue ActiveRecord::RecordNotFound
       raise ScimRails::ExceptionHandler::InvalidCredentials
+    end
+
+    def authorize_basic_auth
+      username_authenticated = @searchable_attribute == ENV['SCIM_USERNAME']
+      password_authenticated = @authentication_attribute == ENV['SCIM_PASSWORD']
+      return username_authenticated && password_authenticated
     end
 
     #company being referenced need to be refactored
