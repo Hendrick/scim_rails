@@ -10,6 +10,7 @@ module ScimRails
     end
 
     def json_scim_response(object:, status: :ok, counts: nil)
+      byebug
       case params[:action]
       when "index"
         render \

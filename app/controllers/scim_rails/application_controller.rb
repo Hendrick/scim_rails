@@ -9,6 +9,7 @@ module ScimRails
     private
 
     def authorize_request
+      # byebug
       authorization = nil
       # I want to only use the basic auth and eliminate the oauth strategy. Less tests to maintain.....
       # byebug
@@ -24,7 +25,8 @@ module ScimRails
     end
 
     def authentication_strategy
-      byebug
+      # byebug
+      # byebug
       if request.headers["Authorization"]&.include?("Bearer")
         :authenticate_with_oauth_bearer
       else

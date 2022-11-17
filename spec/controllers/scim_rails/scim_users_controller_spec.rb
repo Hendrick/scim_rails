@@ -307,8 +307,11 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
       end
 
       it "returns :not_found for a correct id but unauthorized company" do
-        new_company = create(:company)
+        new_company = create(:company, subdomain: 'test2')
+        byebug
+
         create(:user, company: new_company, id: 1)
+        # byebug
 
         get :show, params: { id: 1 }, as: :json
 

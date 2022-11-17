@@ -43,7 +43,6 @@ RSpec.describe ScimRails::ScimUsersController, type: :request do
 
         it "can not parse unfamiliar content types" do
           expect(company.users.count).to eq 0
-          byebug
 
           post_request("text/csv")
 

@@ -25,7 +25,6 @@ module ScimRails
     end
 
     def create
-      byebug
       if ScimRails.config.scim_user_prevent_update_on_create
         user = User.create!(permitted_user_params)
       else
@@ -34,18 +33,19 @@ module ScimRails
         find_by_username[username_key] = permitted_user_params[username_key]
         user = User
           .find_or_create_by(find_by_username)
-          byebug
+          # byebug
         user.assign_attributes(permitted_user_params)
 
-        byebug
+        # byebug
 
         if  ENV['SCIM_USERNAME'].present? &&  ENV['SCIM_PASSWORD'].present?
           #save without validation because this case doesn't have a company associated with the user
           # throw if permitted_user_params[:first_name].nil? || permitted_user_params[:last_name].nil? || permitted_user_params
           user.save(:validate => false)
         else
-          user.company_id = Company.first.id
-          user.save
+          user.company_id = Company.last.id
+          # byebug
+          user.save!
         end
       end
       update_status(user) unless put_active_param.nil?
@@ -53,6 +53,7 @@ module ScimRails
     end
 
     def show
+      byebug
       user = User.find(params[:id])
       json_scim_response(object: user)
     end
@@ -118,7 +119,7 @@ module ScimRails
     end
 
     def active?
-      ctive = put_active_param
+      active = put_active_param
       active = patch_active_param if active.nil?
 
       case active
