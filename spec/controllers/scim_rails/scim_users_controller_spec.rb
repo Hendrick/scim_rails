@@ -305,18 +305,6 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
 
         expect(response.status).to eq 404
       end
-
-      it "returns :not_found for a correct id but unauthorized company" do
-        new_company = create(:company, subdomain: 'test2')
-        byebug
-
-        create(:user, company: new_company, id: 1)
-        # byebug
-
-        get :show, params: { id: 1 }, as: :json
-
-        expect(response.status).to eq 404
-      end
     end
   end
 
@@ -554,15 +542,6 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
 
       it "returns :not_found for id that cannot be found" do
         get :put_update, params: { id: "fake_id" }, as: :json
-
-        expect(response.status).to eq 404
-      end
-
-      it "returns :not_found for a correct id but unauthorized company" do
-        new_company = create(:company)
-        create(:user, company: new_company, id: 1000)
-
-        get :put_update, params: { id: 1000 }, as: :json
 
         expect(response.status).to eq 404
       end
