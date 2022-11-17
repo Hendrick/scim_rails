@@ -12,10 +12,8 @@ module ScimRails
 
     def authenticated2?
       if ENV['SCIM_USERNAME'].present? && ENV['SCIM_PASSWORD'].present?
-        # byebug
         authorize_basic_auth
       else
-        byebug
         company = find_company
         authorize(company)
         company
@@ -30,7 +28,6 @@ module ScimRails
 
     #company being referenced need to be refactored
     def find_company
-      byebug
       @company ||= ScimRails.config.basic_auth_model.find_by!(search_parameter)
 
     rescue ActiveRecord::RecordNotFound

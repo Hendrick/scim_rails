@@ -33,10 +33,7 @@ module ScimRails
         find_by_username[username_key] = permitted_user_params[username_key]
         user = User
           .find_or_create_by(find_by_username)
-          # byebug
         user.assign_attributes(permitted_user_params)
-
-        # byebug
 
         if  ENV['SCIM_USERNAME'].present? &&  ENV['SCIM_PASSWORD'].present?
           #save without validation because this case doesn't have a company associated with the user
@@ -44,7 +41,6 @@ module ScimRails
           user.save(:validate => false)
         else
           user.company_id = Company.last.id
-          # byebug
           user.save!
         end
       end
@@ -53,7 +49,6 @@ module ScimRails
     end
 
     def show
-      byebug
       user = User.find(params[:id])
       json_scim_response(object: user)
     end
