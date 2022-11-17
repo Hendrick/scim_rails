@@ -76,6 +76,17 @@ module ScimRails
         )
       end
 
+      rescue_from ActiveRecord::NotNullViolation do |e|
+        json_response(
+          {
+            schemas: ["urn:ietf:params:scim:api:messages:2.0:Error"],
+            detail: e.message,
+            status: "422"
+          },
+          :unprocessable_entity
+        )
+      end
+
       rescue_from ActiveRecord::RecordInvalid do |e|
         case e.message
         when /has already been taken/

@@ -1,5 +1,7 @@
 class User < ApplicationRecord
-  belongs_to :company
+  # hack until we fully remove company,
+  # prevents a validation error when saving a user without a company
+  belongs_to :company #, optional: true 
 
   validates \
     :first_name,

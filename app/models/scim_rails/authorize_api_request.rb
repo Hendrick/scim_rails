@@ -10,18 +10,12 @@ module ScimRails
       @search_parameter = { ScimRails.config.basic_auth_model_searchable_attribute => @searchable_attribute }
     end
 
-    # #company being referenced need to be refactored
-    # def company
-    #   company = find_company
-    #   authorize(company)
-    #   company
-    # end
-
-
     def authenticated2?
       if ENV['SCIM_USERNAME'].present? && ENV['SCIM_PASSWORD'].present?
+        # byebug
         authorize_basic_auth
       else
+        # byebug
         company = find_company
         authorize(company)
         company
