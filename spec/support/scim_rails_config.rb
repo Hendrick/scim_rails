@@ -2,11 +2,12 @@
 # is included here because it is essentially a spec helper
 
 ScimRails.configure do |config|
-  # we shouldn't have to specify company and should eventually remove this.
+  # We shouldn't have to specify company and should eventually remove this.
   config.basic_auth_model = "Company"
 
-  config.subdomain = nil || ENV['SCIM_USERNAME']
-  config.api_token = nil || ENV['SCIM_PASSWORD']
+  # Note: Setting scim variables in heroku params
+  # config.subdomain - ENV['SCIM_USERNAME']
+  # config.api_token - ENV['SCIM_PASSWORD']
 
   config.scim_users_model = "User"
 
