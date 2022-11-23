@@ -58,7 +58,7 @@ ScimRails.configure do |config|
     emails: [
       {
         value: :email
-      },
+      }
     ],
     active: :unarchived?
   }

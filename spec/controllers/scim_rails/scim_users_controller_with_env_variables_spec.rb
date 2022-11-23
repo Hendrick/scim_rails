@@ -6,13 +6,12 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
   routes { ScimRails::Engine.routes }
 
   describe "index" do
-
     before do
-      @cached_subdomain = ENV['SCIM_USERNAME']
-      @cached_api_token = ENV['SCIM_PASSWORD']
+      @cached_subdomain = ENV["SCIM_USERNAME"]
+      @cached_api_token = ENV["SCIM_PASSWORD"]
 
-      ENV['SCIM_USERNAME'] = 'test_username'
-      ENV['SCIM_PASSWORD'] = 'test_password'
+      ENV["SCIM_USERNAME"] = "test_username"
+      ENV["SCIM_PASSWORD"] = "test_password"
     end
 
     context "when unauthorized" do
@@ -29,7 +28,7 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
       end
 
       it "fails with invalid credentials" do
-        request.env['HTTP_AUTHORIZATION'] = ActionController::HttpAuthentication::Basic.encode_credentials("unauthorized","123456")
+        request.env["HTTP_AUTHORIZATION"] = ActionController::HttpAuthentication::Basic.encode_credentials("unauthorized", "123456")
 
         get :index, as: :json
 
@@ -39,7 +38,7 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
 
     context "when when authorized" do
       before :each do
-        http_login2(ENV['SCIM_USERNAME'], ENV['SCIM_PASSWORD'])
+        http_login2(ENV["SCIM_USERNAME"], ENV["SCIM_PASSWORD"])
       end
 
       it "returns scim+json content type" do
@@ -78,7 +77,7 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
 
         get :index, params: {
           startIndex: 101,
-          count: 200,
+          count: 200
         }, as: :json
         response_body = JSON.parse(response.body)
         expect(response_body["totalResults"]).to eq 400
@@ -87,14 +86,14 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
       end
 
       it "paginates results by configurable scim_users_list_order" do
-        allow(ScimRails.config).to receive(:scim_users_list_order).and_return({ created_at: :desc })
+        allow(ScimRails.config).to receive(:scim_users_list_order).and_return({created_at: :desc})
 
         create_list(:user, 400)
         expect(User.first.id).to eq 1
 
         get :index, params: {
           startIndex: 1,
-          count: 10,
+          count: 10
         }, as: :json
         response_body = JSON.parse(response.body)
         expect(response_body["totalResults"]).to eq 400
@@ -115,8 +114,8 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
       end
 
       it "filters results by provided name filter" do
-        User.new(first_name: "Chidi", last_name: "Anagonye", email: 'test@test.com').save(:validate => false)
-        User.new(first_name: "Eleanor", last_name: "Shellstrop", email: 'test@example.com').save(:validate => false)
+        User.new(first_name: "Chidi", last_name: "Anagonye", email: "test@test.com").save(validate: false)
+        User.new(first_name: "Eleanor", last_name: "Shellstrop", email: "test@example.com").save(validate: false)
 
         get :index, params: {
           filter: "familyName eq Shellstrop"
@@ -146,39 +145,37 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
     end
 
     after do
-      ENV['SCIM_USERNAME'] = @cached_subdomain
-      ENV['SCIM_PASSWORD'] = @cahced_api_token
+      ENV["SCIM_USERNAME"] = @cached_subdomain
+      ENV["SCIM_PASSWORD"] = @cahced_api_token
     end
   end
 
-
   describe "show" do
-
     before do
-      @cached_subdomain = ENV['SCIM_USERNAME']
-      @cached_api_token = ENV['SCIM_PASSWORD']
+      @cached_subdomain = ENV["SCIM_USERNAME"]
+      @cached_api_token = ENV["SCIM_PASSWORD"]
 
-      ENV['SCIM_USERNAME'] = 'test_username'
-      ENV['SCIM_PASSWORD'] = 'test_password'
+      ENV["SCIM_USERNAME"] = "test_username"
+      ENV["SCIM_PASSWORD"] = "test_password"
     end
 
     context "when unauthorized" do
       it "returns scim+json content type" do
-        get :show, params: { id: 1 }, as: :json
+        get :show, params: {id: 1}, as: :json
 
         expect(response.media_type).to eq "application/scim+json"
       end
 
       it "fails with no credentials" do
-        get :show, params: { id: 1 }, as: :json
+        get :show, params: {id: 1}, as: :json
 
         expect(response.status).to eq 401
       end
 
       it "fails with invalid credentials" do
-        request.env['HTTP_AUTHORIZATION'] = ActionController::HttpAuthentication::Basic.encode_credentials("unauthorized","123456")
+        request.env["HTTP_AUTHORIZATION"] = ActionController::HttpAuthentication::Basic.encode_credentials("unauthorized", "123456")
 
-        get :show, params: { id: 1 }, as: :json
+        get :show, params: {id: 1}, as: :json
 
         expect(response.status).to eq 401
       end
@@ -186,43 +183,42 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
 
     context "when authorized" do
       before :each do
-        http_login2(ENV['SCIM_USERNAME'], ENV['SCIM_PASSWORD'])
+        http_login2(ENV["SCIM_USERNAME"], ENV["SCIM_PASSWORD"])
       end
 
       it "returns scim+json content type" do
-        get :show, params: { id: 1 }, as: :json
+        get :show, params: {id: 1}, as: :json
 
         expect(response.media_type).to eq "application/scim+json"
       end
 
       it "is successful with valid credentials" do
         create(:user, id: 1)
-        get :show, params: { id: 1 }, as: :json
+        get :show, params: {id: 1}, as: :json
 
         expect(response.status).to eq 200
       end
 
       it "returns :not_found for id that cannot be found" do
-        get :show, params: { id: "fake_id" }, as: :json
+        get :show, params: {id: "fake_id"}, as: :json
 
         expect(response.status).to eq 404
       end
     end
 
     after do
-      ENV['SCIM_USERNAME'] = @cached_subdomain
-      ENV['SCIM_PASSWORD'] = @cahced_api_token
+      ENV["SCIM_USERNAME"] = @cached_subdomain
+      ENV["SCIM_PASSWORD"] = @cahced_api_token
     end
   end
 
-
   describe "create" do
     before do
-      @cached_subdomain = ENV['SCIM_USERNAME']
-      @cached_api_token = ENV['SCIM_PASSWORD']
+      @cached_subdomain = ENV["SCIM_USERNAME"]
+      @cached_api_token = ENV["SCIM_PASSWORD"]
 
-      ENV['SCIM_USERNAME'] = 'test_username'
-      ENV['SCIM_PASSWORD'] = 'test_password'
+      ENV["SCIM_USERNAME"] = "test_username"
+      ENV["SCIM_PASSWORD"] = "test_password"
     end
 
     context "when unauthorized" do
@@ -239,7 +235,7 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
       end
 
       it "fails with invalid credentials" do
-        request.env['HTTP_AUTHORIZATION'] = ActionController::HttpAuthentication::Basic.encode_credentials("unauthorized","123456")
+        request.env["HTTP_AUTHORIZATION"] = ActionController::HttpAuthentication::Basic.encode_credentials("unauthorized", "123456")
 
         post :create, as: :json
 
@@ -249,7 +245,7 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
 
     context "when authorized" do
       before :each do
-        http_login2(ENV['SCIM_USERNAME'], ENV['SCIM_PASSWORD'])
+        http_login2(ENV["SCIM_USERNAME"], ENV["SCIM_PASSWORD"])
       end
 
       it "returns scim+json content type" do
@@ -376,7 +372,7 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
           emails: [
             {
               value: "test@example.com"
-            },
+            }
           ],
           active: "false"
         }, as: :json
@@ -388,10 +384,9 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
       end
     end
 
-
     after do
-      ENV['SCIM_USERNAME'] = @cached_subdomain
-      ENV['SCIM_PASSWORD'] = @cahced_api_token
+      ENV["SCIM_USERNAME"] = @cached_subdomain
+      ENV["SCIM_PASSWORD"] = @cahced_api_token
     end
   end
 
@@ -400,21 +395,21 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
 
     context "when unauthorized" do
       it "returns scim+json content type" do
-        put :put_update, params: { id: 1 }, as: :json
+        put :put_update, params: {id: 1}, as: :json
 
         expect(response.media_type).to eq "application/scim+json"
       end
 
       it "fails with no credentials" do
-        put :put_update, params: { id: 1 }, as: :json
+        put :put_update, params: {id: 1}, as: :json
 
         expect(response.status).to eq 401
       end
 
       it "fails with invalid credentials" do
-        request.env['HTTP_AUTHORIZATION'] = ActionController::HttpAuthentication::Basic.encode_credentials("unauthorized","123456")
+        request.env["HTTP_AUTHORIZATION"] = ActionController::HttpAuthentication::Basic.encode_credentials("unauthorized", "123456")
 
-        put :put_update, params: { id: 1 }, as: :json
+        put :put_update, params: {id: 1}, as: :json
 
         expect(response.status).to eq 401
       end
@@ -458,7 +453,7 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
       end
 
       it "returns :not_found for id that cannot be found" do
-        get :put_update, params: { id: "fake_id" }, as: :json
+        get :put_update, params: {id: "fake_id"}, as: :json
 
         expect(response.status).to eq 404
       end
@@ -470,7 +465,7 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
           emails: [
             {
               value: "test@example.com"
-            },
+            }
           ],
           active: "true"
         }, as: :json
@@ -479,7 +474,6 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
       end
     end
   end
-
 
   describe "patch update" do
     let(:company) { create(:company) }
@@ -498,7 +492,7 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
       end
 
       it "fails with invalid credentials" do
-        request.env['HTTP_AUTHORIZATION'] = ActionController::HttpAuthentication::Basic.encode_credentials("unauthorized","123456")
+        request.env["HTTP_AUTHORIZATION"] = ActionController::HttpAuthentication::Basic.encode_credentials("unauthorized", "123456")
 
         patch :patch_update, params: patch_params(id: 1), as: :json
 
@@ -549,7 +543,7 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
         user = company.users.first.tap(&:archive!)
         expect(user.archived?).to eq true
 
-        patch :patch_update, params: patch_params(id: 1,  active: true), as: :json
+        patch :patch_update, params: patch_params(id: 1, active: true), as: :json
 
         expect(response.status).to eq 200
         expect(company.users.count).to eq 1
@@ -669,7 +663,7 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
       emails: [
         {
           value: "test@example.com"
-        },
+        }
       ],
       active: active
     }

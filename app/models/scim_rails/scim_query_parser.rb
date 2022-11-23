@@ -23,7 +23,7 @@ module ScimRails
     def parameter
       parameter = query_elements[2..-1].join(" ")
       return if parameter.blank?
-      parameter.gsub(/"/, "")
+      parameter.delete('"')
     end
 
     private

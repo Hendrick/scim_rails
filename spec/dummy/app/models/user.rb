@@ -1,7 +1,7 @@
 class User < ApplicationRecord
   # hack until we fully remove company,
   # prevents a validation error when saving a user without a company
-  belongs_to :company #, optional: true 
+  belongs_to :company # , optional: true
 
   validates \
     :first_name,
@@ -26,7 +26,7 @@ class User < ApplicationRecord
   def archive!
     write_attribute(:archived_at, Time.now)
     # TODO  remove validate clause after we delete company table
-    save(:validate => false)
+    save(validate: false)
   end
 
   def unarchived?
@@ -36,6 +36,6 @@ class User < ApplicationRecord
   def unarchive!
     write_attribute(:archived_at, nil)
     # TODO  remove validate clause after we delete company table
-    save(:validate => false)
+    save(validate: false)
   end
 end

@@ -1,12 +1,10 @@
 require "spec_helper"
 
 RSpec.describe ScimRails::ScimUsersController, type: :request do
-
   context "Basic Authorization" do
-
     context "with Company model table" do
       let(:company) { create(:company) }
-      let(:credentials) { Base64::encode64("#{company.subdomain}:#{company.api_token}") }
+      let(:credentials) { Base64.encode64("#{company.subdomain}:#{company.api_token}") }
       let(:authorization) { "Basic #{credentials}" }
       describe "Content-Type" do
         it "accepts scim+json" do

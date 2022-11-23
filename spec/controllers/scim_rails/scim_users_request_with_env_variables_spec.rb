@@ -1,20 +1,17 @@
 require "spec_helper"
 
 RSpec.describe ScimRails::ScimUsersController, type: :request do
-
   context "Basic Authorization" do
-
     context "with app SCIM authentication ENV variables set" do
-
       before do
-        @cached_subdomain = ENV['SCIM_USERNAME']
-        @cahced_api_token = ENV['SCIM_PASSWORD']
+        @cached_subdomain = ENV["SCIM_USERNAME"]
+        @cahced_api_token = ENV["SCIM_PASSWORD"]
 
-        ENV['SCIM_USERNAME'] = 'test_username'
-        ENV['SCIM_PASSWORD'] = 'test_password'
+        ENV["SCIM_USERNAME"] = "test_username"
+        ENV["SCIM_PASSWORD"] = "test_password"
       end
 
-      let(:credentials) { Base64::encode64("#{'test_username'}:#{'test_password'}") }
+      let(:credentials) { Base64.encode64("test_username:test_password") }
       let(:authorization) { "Basic #{credentials}" }
 
       describe "Content-Type" do
@@ -39,8 +36,8 @@ RSpec.describe ScimRails::ScimUsersController, type: :request do
       end
 
       after do
-        ENV['SCIM_USERNAME'] = @cached_subdomain
-        ENV['SCIM_PASSWORD'] = @cahced_api_token
+        ENV["SCIM_USERNAME"] = @cached_subdomain
+        ENV["SCIM_PASSWORD"] = @cahced_api_token
       end
     end
   end

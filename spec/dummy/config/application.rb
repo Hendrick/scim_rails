@@ -1,6 +1,6 @@
-require_relative 'boot'
+require_relative "boot"
 
-require 'rails/all'
+require "rails/all"
 
 Bundler.require(*Rails.groups)
 require "scim_rails"
@@ -12,4 +12,3 @@ module Dummy
     # -- all .rb files in that directory are automatically loaded.
   end
 end
-
