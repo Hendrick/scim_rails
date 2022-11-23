@@ -4,16 +4,14 @@ module ScimRails
       if params[:filter].present?
         query = ScimRails::ScimQueryParser.new(params[:filter])
 
-        users = @company
-          .public_send(ScimRails.config.scim_users_scope)
+        users = User
           .where(
             "#{ScimRails.config.scim_users_model.connection.quote_column_name(query.attribute)} #{query.operator} ?",
             query.parameter
           )
           .order(ScimRails.config.scim_users_list_order)
       else
-        users = @company
-          .public_send(ScimRails.config.scim_users_scope)
+        users = User
           .order(ScimRails.config.scim_users_list_order)
       end
 
@@ -28,27 +26,35 @@ module ScimRails
 
     def create
       if ScimRails.config.scim_user_prevent_update_on_create
-        user = @company.public_send(ScimRails.config.scim_users_scope).create!(permitted_user_params)
+        user = User.create!(permitted_user_params)
       else
         username_key = ScimRails.config.queryable_user_attributes[:userName]
         find_by_username = Hash.new
         find_by_username[username_key] = permitted_user_params[username_key]
-        user = @company
-          .public_send(ScimRails.config.scim_users_scope)
+        user = User
           .find_or_create_by(find_by_username)
-        user.update!(permitted_user_params)
+        user.assign_attributes(permitted_user_params)
+
+        if  ENV['SCIM_USERNAME'].present? &&  ENV['SCIM_PASSWORD'].present?
+          #save without validation because this case doesn't have a company associated with the user
+          # throw if permitted_user_params[:first_name].nil? || permitted_user_params[:last_name].nil? || permitted_user_params
+          user.save(:validate => false)
+        else
+          user.company_id = Company.last.id
+          user.save!
+        end
       end
       update_status(user) unless put_active_param.nil?
       json_scim_response(object: user, status: :created)
     end
 
     def show
-      user = @company.public_send(ScimRails.config.scim_users_scope).find(params[:id])
+      user = User.find(params[:id])
       json_scim_response(object: user)
     end
 
     def put_update
-      user = @company.public_send(ScimRails.config.scim_users_scope).find(params[:id])
+      user = User.find(params[:id])
       update_status(user) unless put_active_param.nil?
       user.update!(permitted_user_params)
       json_scim_response(object: user)
@@ -57,7 +63,7 @@ module ScimRails
     # TODO: PATCH will only deprovision or reprovision users.
     # This will work just fine for Okta but is not SCIM compliant.
     def patch_update
-      user = @company.public_send(ScimRails.config.scim_users_scope).find(params[:id])
+      user = User.find(params[:id])
       update_status(user)
       json_scim_response(object: user)
     end

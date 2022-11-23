@@ -2,7 +2,13 @@
 # is included here because it is essentially a spec helper
 
 ScimRails.configure do |config|
+  # We shouldn't have to specify company and should eventually remove this.
   config.basic_auth_model = "Company"
+
+  # Note: Setting scim variables in heroku params
+  # config.subdomain - ENV['SCIM_USERNAME']
+  # config.api_token - ENV['SCIM_PASSWORD']
+
   config.scim_users_model = "User"
 
   config.basic_auth_model_searchable_attribute = :subdomain
@@ -52,7 +58,7 @@ ScimRails.configure do |config|
     emails: [
       {
         value: :email
-      },
+      }
     ],
     active: :unarchived?
   }

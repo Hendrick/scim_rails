@@ -6,7 +6,7 @@ module ScimRails
 
     def encode(company)
       payload = {
-        iat: Time.current.to_i,
+        :iat => Time.current.to_i,
         ScimRails.config.basic_auth_model_searchable_attribute =>
           company.public_send(ScimRails.config.basic_auth_model_searchable_attribute)
       }

@@ -6,6 +6,7 @@ spec/dummy/db/*.sqlite3-journal
 spec/dummy/log/*.log
 spec/dummy/tmp/
 .rubocop-https*
+.byebug_history
 
 */vendor/bundle/*
 *emfile.lock

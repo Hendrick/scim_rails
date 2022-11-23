@@ -6,10 +6,10 @@ describe ScimRails::Encoder do
   describe "::encode" do
     context "with signing configuration" do
       it "generates a signed token with the company attribute" do
-        token   = ScimRails::Encoder.encode(company)
+        token = ScimRails::Encoder.encode(company)
         payload = ScimRails::Encoder.decode(token)
 
-        expect(token).to match /[a-z|A-Z|0-9.]{16,}\.[a-z|A-Z|0-9.]{16,}/
+        expect(token).to match(/[a-z|A-Z0-9.]{16,}\.[a-z|A-Z0-9.]{16,}/)
         expect(payload).to contain_exactly(["iat", Integer], ["subdomain", "test"])
       end
     end
@@ -21,10 +21,10 @@ describe ScimRails::Encoder do
       end
 
       it "generates an unsigned token with the company attribute" do
-        token   = ScimRails::Encoder.encode(company)
+        token = ScimRails::Encoder.encode(company)
         payload = ScimRails::Encoder.decode(token)
 
-        expect(token).to match /[a-z|A-Z|0-9.]{16,}/
+        expect(token).to match(/[a-z|A-Z0-9.]{16,}/)
         expect(payload).to contain_exactly(["iat", Integer], ["subdomain", "test"])
       end
     end

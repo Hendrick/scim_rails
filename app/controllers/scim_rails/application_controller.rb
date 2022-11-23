@@ -9,14 +9,15 @@ module ScimRails
     private
 
     def authorize_request
+      authorization = nil
+      # I want to only use the basic auth and eliminate the oauth strategy. Less tests to maintain.....
       send(authentication_strategy) do |searchable_attribute, authentication_attribute|
         authorization = AuthorizeApiRequest.new(
           searchable_attribute: searchable_attribute,
           authentication_attribute: authentication_attribute
         )
-        @company = authorization.company
       end
-      raise ScimRails::ExceptionHandler::InvalidCredentials if @company.blank?
+      raise ScimRails::ExceptionHandler::InvalidCredentials unless authorization&.authenticated2?
     end
 
     def authentication_strategy

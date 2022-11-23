@@ -32,13 +32,13 @@ module ScimRails
         .offset(counts.offset)
         .limit(counts.limit)
       {
-        "schemas": [
-            "urn:ietf:params:scim:api:messages:2.0:ListResponse"
+        schemas: [
+          "urn:ietf:params:scim:api:messages:2.0:ListResponse"
         ],
-        "totalResults": counts.total,
-        "startIndex": counts.start_index,
-        "itemsPerPage": counts.limit,
-        "Resources": list_users(object)
+        totalResults: counts.total,
+        startIndex: counts.start_index,
+        itemsPerPage: counts.limit,
+        Resources: list_users(object)
       }
     end
 
@@ -52,7 +52,6 @@ module ScimRails
       schema = ScimRails.config.user_schema
       find_value(user, schema)
     end
-
 
     # `find_value` is a recursive method that takes a "user" and a
     # "user schema" and replaces any symbols in the schema with the
