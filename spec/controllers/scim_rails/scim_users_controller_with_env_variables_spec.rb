@@ -7,8 +7,15 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
 
   describe "index" do
 
+    before do
+      @cached_subdomain = ENV['SCIM_USERNAME']
+      @cached_api_token = ENV['SCIM_PASSWORD']
+
+      ENV['SCIM_USERNAME'] = 'test_username'
+      ENV['SCIM_PASSWORD'] = 'test_password'
+    end
+
     context "when unauthorized" do
-      let(:company) { create(:company) }
       it "returns scim+json content type" do
         get :index, as: :json
 
@@ -31,9 +38,8 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
     end
 
     context "when when authorized" do
-      let(:company) { create(:company) }
       before :each do
-        http_login(company)
+        http_login2(ENV['SCIM_USERNAME'], ENV['SCIM_PASSWORD'])
       end
 
       it "returns scim+json content type" do
@@ -49,7 +55,7 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
       end
 
       it "returns all results" do
-        create_list(:user, 10, company: company)
+        create_list(:user, 10)
 
         get :index, as: :json
         response_body = JSON.parse(response.body)
@@ -58,7 +64,7 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
       end
 
       it "defaults to 100 results" do
-        create_list(:user, 300, company: company)
+        create_list(:user, 300)
 
         get :index, as: :json
         response_body = JSON.parse(response.body)
@@ -67,8 +73,8 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
       end
 
       it "paginates results" do
-        create_list(:user, 400, company: company)
-        expect(company.users.first.id).to eq 1
+        create_list(:user, 400)
+        expect(User.first.id).to eq 1
 
         get :index, params: {
           startIndex: 101,
@@ -83,8 +89,8 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
       it "paginates results by configurable scim_users_list_order" do
         allow(ScimRails.config).to receive(:scim_users_list_order).and_return({ created_at: :desc })
 
-        create_list(:user, 400, company: company)
-        expect(company.users.first.id).to eq 1
+        create_list(:user, 400)
+        expect(User.first.id).to eq 1
 
         get :index, params: {
           startIndex: 1,
@@ -97,8 +103,8 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
       end
 
       it "filters results by provided email filter" do
-        create(:user, email: "test1@example.com", company: company)
-        create(:user, email: "test2@example.com", company: company)
+        create(:user, email: "test1@example.com")
+        create(:user, email: "test2@example.com")
 
         get :index, params: {
           filter: "email eq test1@example.com"
@@ -109,8 +115,8 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
       end
 
       it "filters results by provided name filter" do
-        create(:user, first_name: "Chidi", last_name: "Anagonye", company: company)
-        create(:user, first_name: "Eleanor", last_name: "Shellstrop", company: company)
+        User.new(first_name: "Chidi", last_name: "Anagonye", email: 'test@test.com').save(:validate => false)
+        User.new(first_name: "Eleanor", last_name: "Shellstrop", email: 'test@example.com').save(:validate => false)
 
         get :index, params: {
           filter: "familyName eq Shellstrop"
@@ -138,11 +144,23 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
         expect(response_body.dig("schemas", 0)).to eq "urn:ietf:params:scim:api:messages:2.0:Error"
       end
     end
+
+    after do
+      ENV['SCIM_USERNAME'] = @cached_subdomain
+      ENV['SCIM_PASSWORD'] = @cahced_api_token
+    end
   end
 
 
   describe "show" do
-    let(:company) { create(:company) }
+
+    before do
+      @cached_subdomain = ENV['SCIM_USERNAME']
+      @cached_api_token = ENV['SCIM_PASSWORD']
+
+      ENV['SCIM_USERNAME'] = 'test_username'
+      ENV['SCIM_PASSWORD'] = 'test_password'
+    end
 
     context "when unauthorized" do
       it "returns scim+json content type" do
@@ -168,7 +186,7 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
 
     context "when authorized" do
       before :each do
-        http_login(company)
+        http_login2(ENV['SCIM_USERNAME'], ENV['SCIM_PASSWORD'])
       end
 
       it "returns scim+json content type" do
@@ -178,7 +196,7 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
       end
 
       it "is successful with valid credentials" do
-        create(:user, id: 1, company: company)
+        create(:user, id: 1)
         get :show, params: { id: 1 }, as: :json
 
         expect(response.status).to eq 200
@@ -190,11 +208,22 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
         expect(response.status).to eq 404
       end
     end
+
+    after do
+      ENV['SCIM_USERNAME'] = @cached_subdomain
+      ENV['SCIM_PASSWORD'] = @cahced_api_token
+    end
   end
 
 
   describe "create" do
-    let(:company) { create(:company) }
+    before do
+      @cached_subdomain = ENV['SCIM_USERNAME']
+      @cached_api_token = ENV['SCIM_PASSWORD']
+
+      ENV['SCIM_USERNAME'] = 'test_username'
+      ENV['SCIM_PASSWORD'] = 'test_password'
+    end
 
     context "when unauthorized" do
       it "returns scim+json content type" do
@@ -220,7 +249,7 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
 
     context "when authorized" do
       before :each do
-        http_login(company)
+        http_login2(ENV['SCIM_USERNAME'], ENV['SCIM_PASSWORD'])
       end
 
       it "returns scim+json content type" do
@@ -240,7 +269,7 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
       end
 
       it "is successful with valid credentials" do
-        expect(company.users.count).to eq 0
+        expect(User.count).to eq 0
 
         post :create, params: {
           name: {
@@ -253,10 +282,9 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
             }
           ]
         }, as: :json
-
         expect(response.status).to eq 201
-        expect(company.users.count).to eq 1
-        user = company.users.first
+        expect(User.count).to eq 1
+        user = User.first
         expect(user.persisted?).to eq true
         expect(user.first_name).to eq "New"
         expect(user.last_name).to eq "User"
@@ -278,7 +306,7 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
         }, as: :json
 
         expect(response.status).to eq 201
-        expect(company.users.count).to eq 1
+        expect(User.count).to eq 1
       end
 
       it "returns 422 if required params are missing" do
@@ -294,11 +322,11 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
         }, as: :json
 
         expect(response.status).to eq 422
-        expect(company.users.count).to eq 0
+        expect(User.count).to eq 0
       end
 
       it "returns 201 if user already exists and updates user" do
-        create(:user, email: "new@example.com", company: company)
+        create(:user, email: "new@example.com")
 
         post :create, params: {
           name: {
@@ -313,13 +341,13 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
         }, as: :json
 
         expect(response.status).to eq 201
-        expect(company.users.count).to eq 1
-        expect(company.users.first.first_name).to eq "Not New"
+        expect(User.count).to eq 1
+        expect(User.first.first_name).to eq "Not New"
       end
 
       it "returns 409 if user already exists and config.scim_user_prevent_update_on_create is set to true" do
         allow(ScimRails.config).to receive(:scim_user_prevent_update_on_create).and_return(true)
-        create(:user, email: "new@example.com", company: company)
+        create(:user, email: "new@example.com")
 
         post :create, params: {
           name: {
@@ -334,7 +362,7 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
         }, as: :json
 
         expect(response.status).to eq 409
-        expect(company.users.count).to eq 1
+        expect(User.count).to eq 1
       end
 
       it "creates and archives inactive user" do
@@ -354,13 +382,18 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
         }, as: :json
 
         expect(response.status).to eq 201
-        expect(company.users.count).to eq 1
-        user = company.users.first
+        expect(User.count).to eq 1
+        user = User.first
         expect(user.archived?).to eq true
       end
     end
-  end
 
+
+    after do
+      ENV['SCIM_USERNAME'] = @cached_subdomain
+      ENV['SCIM_PASSWORD'] = @cahced_api_token
+    end
+  end
 
   describe "put update" do
     let(:company) { create(:company) }

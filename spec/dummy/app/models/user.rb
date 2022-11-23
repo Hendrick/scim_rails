@@ -25,7 +25,8 @@ class User < ApplicationRecord
 
   def archive!
     write_attribute(:archived_at, Time.now)
-    save!
+    # TODO  remove validate clause after we delete company table
+    save(:validate => false)
   end
 
   def unarchived?
@@ -34,6 +35,7 @@ class User < ApplicationRecord
 
   def unarchive!
     write_attribute(:archived_at, nil)
-    save!
+    # TODO  remove validate clause after we delete company table
+    save(:validate => false)
   end
 end
