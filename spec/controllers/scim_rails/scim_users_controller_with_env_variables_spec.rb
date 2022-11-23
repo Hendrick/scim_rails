@@ -391,7 +391,14 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
   end
 
   describe "put update" do
-    let(:company) { create(:company) }
+    before do
+      @cached_subdomain = ENV["SCIM_USERNAME"]
+      @cached_api_token = ENV["SCIM_PASSWORD"]
+
+      ENV["SCIM_USERNAME"] = "test_username"
+      ENV["SCIM_PASSWORD"] = "test_password"
+
+    end
 
     context "when unauthorized" do
       it "returns scim+json content type" do
@@ -416,10 +423,10 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
     end
 
     context "when authorized" do
-      let!(:user) { create(:user, id: 1, company: company) }
+      let!(:user) { create(:user, id: 1) }
 
       before :each do
-        http_login(company)
+        http_login2(ENV["SCIM_USERNAME"], ENV["SCIM_PASSWORD"])
       end
 
       it "returns scim+json content type" do
@@ -473,10 +480,22 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
         expect(response.status).to eq 422
       end
     end
+
+    after do
+      ENV["SCIM_USERNAME"] = @cached_subdomain
+      ENV["SCIM_PASSWORD"] = @cahced_api_token
+    end
   end
 
   describe "patch update" do
-    let(:company) { create(:company) }
+
+    before do
+      @cached_subdomain = ENV["SCIM_USERNAME"]
+      @cached_api_token = ENV["SCIM_PASSWORD"]
+
+      ENV["SCIM_USERNAME"] = "test_username"
+      ENV["SCIM_PASSWORD"] = "test_password"
+    end
 
     context "when unauthorized" do
       it "returns scim+json content type" do
@@ -501,10 +520,10 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
     end
 
     context "when authorized" do
-      let!(:user) { create(:user, id: 1, company: company) }
+      let!(:user) { create(:user, id: 1) }
 
       before :each do
-        http_login(company)
+        http_login2(ENV["SCIM_USERNAME"], ENV["SCIM_PASSWORD"])
       end
 
       it "returns scim+json content type" do
@@ -526,27 +545,27 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
       end
 
       it "successfully archives user" do
-        expect(company.users.count).to eq 1
-        user = company.users.first
+        expect(User.count).to eq 1
+        user = User.first
         expect(user.archived?).to eq false
 
         patch :patch_update, params: patch_params(id: 1), as: :json
 
         expect(response.status).to eq 200
-        expect(company.users.count).to eq 1
+        expect(User.count).to eq 1
         user.reload
         expect(user.archived?).to eq true
       end
 
       it "successfully restores user" do
-        expect(company.users.count).to eq 1
-        user = company.users.first.tap(&:archive!)
+        expect(User.count).to eq 1
+        user = User.first.tap(&:archive!)
         expect(user.archived?).to eq true
 
         patch :patch_update, params: patch_params(id: 1, active: true), as: :json
 
         expect(response.status).to eq 200
-        expect(company.users.count).to eq 1
+        expect(User.count).to eq 1
         user.reload
         expect(user.archived?).to eq false
       end
@@ -635,6 +654,11 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
         response_body = JSON.parse(response.body)
         expect(response_body.dig("schemas", 0)).to eq "urn:ietf:params:scim:api:messages:2.0:Error"
       end
+    end
+
+    after do
+      ENV["SCIM_USERNAME"] = @cached_subdomain
+      ENV["SCIM_PASSWORD"] = @cahced_api_token
     end
   end
 

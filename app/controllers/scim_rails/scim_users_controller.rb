@@ -29,16 +29,16 @@ module ScimRails
         user = User.create!(permitted_user_params)
       else
         username_key = ScimRails.config.queryable_user_attributes[:userName]
-        find_by_username = {}
+        find_by_username = Hash.new
         find_by_username[username_key] = permitted_user_params[username_key]
         user = User
           .find_or_create_by(find_by_username)
         user.assign_attributes(permitted_user_params)
 
-        if ENV["SCIM_USERNAME"].present? && ENV["SCIM_PASSWORD"].present?
-          # save without validation because this case doesn't have a company associated with the user
+        if  ENV['SCIM_USERNAME'].present? &&  ENV['SCIM_PASSWORD'].present?
+          #save without validation because this case doesn't have a company associated with the user
           # throw if permitted_user_params[:first_name].nil? || permitted_user_params[:last_name].nil? || permitted_user_params
-          user.save(validate: false)
+          user.save(:validate => false)
         else
           user.company_id = Company.last.id
           user.save!
